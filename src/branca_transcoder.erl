@@ -7,25 +7,27 @@
 %% API functions
 %%====================================================================
 convert(Data, SrcBase, DstBase) ->
-  lists:reverse(convert(<<>>, Data, SrcBase, DstBase)).
+  convert(<<>>, Data, SrcBase, DstBase).
 
 %%====================================================================
 %% Internal functions
 %%====================================================================
 convert(Result, <<>>, _, _) -> Result;
 
-convert(Result, Data, SrBase, DstBase) ->
-  Quotient = <<>>,
-  Remainder = 0.
+convert(Result, Data, SrcBase, DstBase) ->
+  {Quotient, Rem} = convert(Data, <<>>, 0, SrcBase, DstBase),
+  convert(<<Rem, Result/binary>>, Quotient, SrcBase, DstBase).
 
 
-fori(<<H, T/binary>>, Quotient, Rem, SrcBase, DstBase) ->
-  Accumulator = H + (Rem * SrcBase),
+convert(<<H, T/binary>>, Quotient, PrevRem, SrcBase, DstBase) ->
+  Accumulator = H + (PrevRem * SrcBase),
   Digit = Accumulator div DstBase,
-  Rem2 = Accumulator rem DstBase,
+  Rem = Accumulator rem DstBase,
   if
     0 /= byte_size(Quotient) orelse 0 /= Digit ->
-      fori(T, <<Digit, Quotient/binary>>, Rem2, SrcBase, DstBase);
+      convert(T, <<Quotient/binary, Digit>>, Rem, SrcBase, DstBase);
     true ->
-      fori(T, Quotient, Rem2, SrcBase, DstBase)
-  end.
+      convert(T, Quotient, Rem, SrcBase, DstBase)
+  end;
+
+convert(<<>>, Quotient, PrevRem, _, _) -> {Quotient, PrevRem}.
