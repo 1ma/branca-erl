@@ -8,13 +8,13 @@
 %%====================================================================
 %% API functions
 %%====================================================================
-encode(Data) ->
+encode(Data) when is_binary(Data) ->
   erlang:list_to_binary(lists:map(
     fun(Elem) -> lists:nth(Elem + 1, ?BASE62_ALPHABET) end,
     erlang:binary_to_list(branca_transcoder:transcode(Data, 256, 62))
   )).
 
-decode(Data) ->
+decode(Data) when is_binary(Data) ->
   branca_transcoder:transcode(
     erlang:list_to_binary(lists:map(
       fun(Elem) -> index_of(Elem, ?BASE62_ALPHABET) end,

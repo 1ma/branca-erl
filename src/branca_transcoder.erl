@@ -6,7 +6,13 @@
 %%====================================================================
 %% API functions
 %%====================================================================
-transcode(Data, SrcBase, DstBase) -> transcode(<<>>, Data, SrcBase, DstBase).
+transcode(Data, SrcBase, DstBase)
+  when
+    is_binary(Data),
+    is_integer(SrcBase) andalso 2 =< SrcBase andalso 256 >= SrcBase,
+    is_integer(DstBase) andalso 2 =< DstBase andalso 256 >= DstBase
+
+  -> transcode(<<>>, Data, SrcBase, DstBase).
 
 %%====================================================================
 %% Internal functions
