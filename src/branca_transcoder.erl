@@ -6,6 +6,9 @@
 %%====================================================================
 %% API functions
 %%====================================================================
+transcode(<<0, Data/binary>>, SrcBase, DstBase) ->
+  <<0, (transcode(Data, SrcBase, DstBase))/binary>>;
+
 transcode(Data, SrcBase, DstBase)
   when
     is_binary(Data),
