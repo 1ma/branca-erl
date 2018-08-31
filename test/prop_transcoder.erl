@@ -1,5 +1,7 @@
 -module(prop_transcoder).
+-import(branca_transcoder, [transcode/3]).
 -include_lib("proper/include/proper.hrl").
+
 
 %%%%%%%%%%%%%%%%%%
 %%% Properties %%%
@@ -7,7 +9,7 @@
 prop_symmetric_transcoding() ->
   ?FORALL(
     {{Data, SrcBase}, DstBase}, {based_binary(), range(2, 256)},
-    Data =:= branca_transcoder:transcode(branca_transcoder:transcode(Data, SrcBase, DstBase), DstBase, SrcBase)
+    Data =:= transcode(transcode(Data, SrcBase, DstBase), DstBase, SrcBase)
   ).
 
 %%%%%%%%%%%%%%%

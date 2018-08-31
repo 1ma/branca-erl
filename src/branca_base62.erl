@@ -1,4 +1,5 @@
 -module(branca_base62).
+-import(branca_transcoder, [transcode/3]).
 
 %% API exports
 -export([encode/1, decode/1]).
@@ -11,11 +12,11 @@
 encode(Data) when is_binary(Data) ->
   erlang:list_to_binary(lists:map(
     fun(Elem) -> lists:nth(Elem + 1, ?BASE62_ALPHABET) end,
-    erlang:binary_to_list(branca_transcoder:transcode(Data, 256, 62))
+    erlang:binary_to_list(transcode(Data, 256, 62))
   )).
 
 decode(Data) when is_binary(Data) ->
-  branca_transcoder:transcode(
+  transcode(
     erlang:list_to_binary(lists:map(
       fun(Elem) -> index_of(Elem, ?BASE62_ALPHABET) end,
       erlang:binary_to_list(Data)

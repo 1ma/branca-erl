@@ -3,6 +3,9 @@
 %% API exports
 -export([transcode/3]).
 
+-define(MIN_BASE, 2).
+-define(MAX_BASE, 256).
+
 %%====================================================================
 %% API functions
 %%====================================================================
@@ -12,8 +15,8 @@ transcode(<<0, Data/binary>>, SrcBase, DstBase) ->
 transcode(Data, SrcBase, DstBase)
   when
     is_binary(Data),
-    is_integer(SrcBase) andalso 2 =< SrcBase andalso 256 >= SrcBase,
-    is_integer(DstBase) andalso 2 =< DstBase andalso 256 >= DstBase
+    is_integer(SrcBase) andalso ?MIN_BASE =< SrcBase andalso ?MAX_BASE >= SrcBase,
+    is_integer(DstBase) andalso ?MIN_BASE =< DstBase andalso ?MAX_BASE >= DstBase
 
   -> transcode(<<>>, Data, SrcBase, DstBase).
 
