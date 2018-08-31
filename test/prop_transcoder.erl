@@ -22,5 +22,5 @@ prop_symmetric_transcoding() ->
 based_binary() ->
   ?LET(
     {Data, Base}, {binary(), range(2, 256)},
-    {erlang:list_to_binary([X rem Base || <<X>> <= Data]), Base}
+    {<< <<(X rem Base)/integer>> || <<X>> <= Data >>, Base}
   ).

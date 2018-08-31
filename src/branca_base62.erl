@@ -10,17 +10,11 @@
 %% API functions
 %%====================================================================
 encode(Data) when is_binary(Data) ->
-  erlang:list_to_binary(lists:map(
-    fun(Elem) -> lists:nth(Elem + 1, ?BASE62_ALPHABET) end,
-    erlang:binary_to_list(transcode(Data, 256, 62))
-  )).
+  << <<(lists:nth(Elem + 1, ?BASE62_ALPHABET))/integer>> || <<Elem>> <= transcode(Data, 256, 62) >>.
 
 decode(Data) when is_binary(Data) ->
   transcode(
-    erlang:list_to_binary(lists:map(
-      fun(Elem) -> index_of(Elem, ?BASE62_ALPHABET) end,
-      erlang:binary_to_list(Data)
-    )),
+    << <<(index_of(Elem, ?BASE62_ALPHABET))/integer>> || <<Elem>> <= Data >>,
     62,
     256
   ).
