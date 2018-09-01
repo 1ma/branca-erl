@@ -31,7 +31,11 @@ decode(CipherText, Secret)
 
   <<Header:17/bytes, Payload/binary>> = decode(CipherText),
   <<16#BA, _:4/bytes, Nonce:12/bytes>> = Header,
-  ietf_decrypt(Payload, Header, Nonce, Secret).
+  Result = ietf_decrypt(Payload, Header, Nonce, Secret),
+  if
+    -1 =:= Result -> throw(invalid_token);
+    true -> Result
+  end.
 
 %%====================================================================
 %% Internal functions
