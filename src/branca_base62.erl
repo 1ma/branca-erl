@@ -10,16 +10,17 @@
 encode(Data) when is_binary(Data) ->
   << <<(if
          Byte < 10 -> Byte + $0;
-         Byte < 36 -> Byte + ($A - 10);
-         true -> Byte + ($a - 36)
+         Byte < 36 -> Byte + $A - 10;
+         true -> Byte + $a - 36
        end)/integer>> || <<Byte>> <= transcode(Data, 256, 62) >>.
 
 decode(Data) when is_binary(Data) ->
   transcode(
     << <<(if
-            Byte < 58 -> Byte - $0;
-            Byte < 91 -> Byte - ($A - 10);
-            true -> Byte - ($a - 36)
+            $0 =< Byte andalso Byte =< $9 -> Byte - $0;
+            $A =< Byte andalso Byte =< $Z -> Byte - $A + 10;
+            $a =< Byte andalso Byte =< $z -> Byte - $a + 36;
+            true -> throw(bad_encoding)
           end)/integer>> || <<Byte>> <= Data >>,
     62,
     256
