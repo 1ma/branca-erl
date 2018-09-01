@@ -6,10 +6,10 @@
 %%% Properties %%%
 %%%%%%%%%%%%%%%%%%
 prop_symmetric_encoding() ->
-    ?FORALL(
-        Data, binary(),
-        Data =:= decode(encode(Data))
-    ).
+  ?FORALL(
+    Data, binary(),
+    Data =:= decode(encode(Data))
+  ).
 
 %%%%%%%%%%%%%%%
 %%% Helpers %%%

@@ -12,13 +12,19 @@ prop_symmetric_transcoding() ->
     Data =:= transcode(transcode(Data, SrcBase, DstBase), DstBase, SrcBase)
   ).
 
-prop_encoded_has_destination_base() ->
+prop_transcoded_has_target_base() ->
   ?FORALL(
     {{Data, SrcBase}, DstBase}, {based_binary(), range(2, 256)},
     lists:all(
       fun(Byte) -> Byte < DstBase end,
       erlang:binary_to_list(transcode(Data, SrcBase, DstBase))
     )
+  ).
+
+prop_transcoding_to_same_base_has_no_effect() ->
+  ?FORALL(
+    {Data, Base}, based_binary(),
+    Data =:= transcode(Data, Base, Base)
   ).
 
 
