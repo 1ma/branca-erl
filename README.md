@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/1ma/branca-erl.svg?branch=master)](https://travis-ci.org/1ma/branca-erl)
 
-An Erlang implementation of the Branca specification for authenticated and encrypted tokens.
+An Erlang implementation of the [Branca specification] for authenticated and encrypted tokens.
 
 These are symmetrically encrypted, tamper-proof strings of arbitrary contents that can be safely exposed.
 
@@ -13,7 +13,7 @@ Add this to your `rebar.config` file to install the library through hex.pm:
 
 ```erlang
 {deps, [
-    {branca, "0.1.0"}
+    {branca_erl, "0.1.1"}
 ]}.
 ```
 
@@ -40,7 +40,7 @@ Add this to your `rebar.config` file to install the library through hex.pm:
 
 - `{ok, OriginalData}` -> successful decryption.
 - `{error, expired_timestamp, {Timestamp, OriginalData}}` -> Successful decryption, but the token expired (not yet implemented).
-- `{error, bad_encoding}` -> contained at least one non-base62 character (these are [0-9A-Za-z]).
+- `{error, bad_encoding}` -> CipherText contained at least one non-base62 character (these are [0-9A-Za-z]).
 - `{error, invalid_token}` -> CipherText is base62, but it does not have the [layout] of a valid Branca token.
 - `{error, invalid_sig}` -> the Secret used to decrypt the token is incorrect, or the token has been tampered.
 
@@ -70,5 +70,5 @@ These can be run with the usual rebar3 commands (`rebar3 eunit` and `rebar3 prop
 - [ ] Spec annotations for Dialyzer
 - [ ] Improve all modules documentation
 
-
+[Branca specification]: https://github.com/tuupola/branca-spec
 [layout]: https://github.com/tuupola/branca-spec#token-format
