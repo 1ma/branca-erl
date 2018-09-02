@@ -1,5 +1,7 @@
 # branca-erl
 
+[![Build Status](https://travis-ci.org/1ma/branca-erl.svg?branch=master)](https://travis-ci.org/1ma/branca-erl)
+
 An Erlang implementation of the Branca specification for authenticated and encrypted tokens.
 
 These are symmetrically encrypted, tamper-proof strings of arbitrary contents that can be safely exposed.

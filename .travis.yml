@@ -1,0 +1,18 @@
+language: erlang
+otp_release:
+  - 21.0
+  - 20.0
+  - 19.0
+  - 18.3
+
+before_script:
+  - kerl list installations
+  - rebar3 as test get-deps
+
+script:
+  - rebar3 as test eunit
+  - rebar3 as test proper -n 10000
+
+cache:
+  directories:
+  - $HOME/.cache/rebar3
