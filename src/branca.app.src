@@ -1,5 +1,5 @@
 {application, branca,
- [{description, "An OTP library"},
+ [{description, "An Erlang implementation of the Branca specification for authenticated and encrypted tokens"},
   {vsn, "0.1.0"},
   {registered, []},
   {applications,
@@ -8,8 +8,10 @@
    ]},
   {env,[]},
   {modules, []},
-
-  {maintainers, []},
-  {licenses, ["Apache 2.0"]},
-  {links, []}
+  {maintainers, ["Marcel Hernandez"]},
+  {licenses, ["MIT"]},
+  {links, [
+   {"GitHub", "https://github.com/1ma/branca-erl"},
+   {"Branca Specification", "https://github.com/tuupola/branca-spec"}
+  ]}
  ]}.
