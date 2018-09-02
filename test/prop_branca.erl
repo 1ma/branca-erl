@@ -8,7 +8,7 @@
 prop_symmetric_encryption() ->
   ?FORALL(
     {Message, Secret}, {binary(), binary(32)},
-    Message =:= decode(encode(Message, Secret), Secret)
+    {ok, Message} =:= decode(encode(Message, Secret), Secret)
   ).
 
 %%%%%%%%%%%%%%%
