@@ -8,24 +8,26 @@
 %% API functions
 %%====================================================================
 encode(Data) when is_binary(Data) ->
-  << <<(if
-         Byte < 10 -> Byte + $0;
-         Byte < 36 -> Byte + $A - 10;
-         true -> Byte + $a - 36
-       end)/integer>> || <<Byte>> <= transcode(Data, 256, 62) >>.
+  << <<(map(Num))/integer>> || <<Num>> <= transcode(Data, 256, 62) >>.
 
 decode(Data) when is_binary(Data) ->
-  transcode(
-    << <<(if
-            $0 =< Byte andalso Byte =< $9 -> Byte - $0;
-            $A =< Byte andalso Byte =< $Z -> Byte - $A + 10;
-            $a =< Byte andalso Byte =< $z -> Byte - $a + 36;
-            true -> throw(bad_encoding)
-          end)/integer>> || <<Byte>> <= Data >>,
-    62,
-    256
-  ).
+  transcode(<< <<(unmap(Char))/integer>> || <<Char>> <= Data >>, 62, 256).
 
 %%====================================================================
 %% Internal functions
 %%====================================================================
+map(Num) when Num < 10
+  -> Num + $0;
+map(Num) when Num < 36
+  -> Num + $A - 10;
+map(Num)
+  -> Num + $a - 36.
+
+unmap(Char) when $0 =< Char, Char =< $9
+  -> Char - $0;
+unmap(Char) when $A =< Char, Char =< $Z
+  -> Char - $A + 10;
+unmap(Char) when $a =< Char, Char =< $z
+  -> Char - $a + 36;
+unmap(_)
+  -> throw(bad_encoding).
