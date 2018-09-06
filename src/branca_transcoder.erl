@@ -15,8 +15,12 @@ transcode(<<0, Data/binary>>, SrcBase, DstBase) ->
 transcode(Data, SrcBase, DstBase)
   when
     is_binary(Data),
-    is_integer(SrcBase) andalso ?MIN_BASE =< SrcBase andalso ?MAX_BASE >= SrcBase,
-    is_integer(DstBase) andalso ?MIN_BASE =< DstBase andalso ?MAX_BASE >= DstBase
+    is_integer(SrcBase),
+    is_integer(DstBase),
+    ?MIN_BASE =< SrcBase,
+    ?MIN_BASE =< DstBase,
+    ?MAX_BASE >= SrcBase,
+    ?MAX_BASE >= DstBase
 
   -> transcode(<<>>, Data, SrcBase, DstBase).
 
