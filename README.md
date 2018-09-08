@@ -42,11 +42,11 @@ Add this to your `rebar.config` file to install the library through hex.pm:
 
 ### `branca:encode/2`
 
-Uses `Secret` to turn `PlainText` into a Branca token. Returns the token as an Erlang binary.
+Uses `Secret` to turn `PlainText` into a Branca token using the current Unix time as the [timestamp]. Returns the token as an Erlang binary.
 
 ### `branca:encode/3`
 
-Same as above, but using a custom [timestamp]. If used, it must be greater than 0 and less than 2^32 (4 bytes long).
+Same as above, but using a custom timestamp. If used, it must be greater than 0 and less than 2^32 (4 bytes long).
 
 ### `branca:decode/2`
 
@@ -55,11 +55,11 @@ Uses `Secret` to turn a Branca token into the original `PlainText`. Returns a tw
 - `{ok, PlainText}` -> successful token decryption.
 - `{error, bad_encoding}` -> `CipherText` contains at least one non-base62 character.
 - `{error, invalid_token}` -> `CipherText` is base62, but it does not have the [layout] of a valid Branca token.
-- `{error, invalid_sig}` -> the Secret used to decrypt the token is incorrect, or the token has been tampered.
+- `{error, invalid_sig}` -> the `Secret` used to decrypt the token is incorrect, or the token has been tampered.
 
 ### `branca:decode/3`
 
-Same as above, but using a `TTL` to determine if the token has to be considered stale. Might return all of the above tuples, plus:
+Same as above, but using a `TTL` to determine if the token has to be considered stale. Might return any of the above tuples, plus:
 
 - `{expired, PlainText}` -> the token was successfully decrypted, but it expired (i.e. it was minted more than `TTL` seconds ago).
 
@@ -86,8 +86,8 @@ These can be run with the usual rebar3 commands (`rebar3 eunit` and `rebar3 prop
 
 ## TODO
 
-- [ ] Travis CI build
-- [ ] Timestamp expiration
+- [X] Travis CI build
+- [X] Timestamp expiration
 - [ ] Spec annotations for Dialyzer
 - [ ] Improve all modules documentation
 
