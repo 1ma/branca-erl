@@ -18,11 +18,12 @@ Add this to your `rebar.config` file to install the library through hex.pm:
 ```
 
 
-## Usage
+## Basic Usage
 
 ```erlang
-1> Secret = <<"supersecretkeyyoushouldnotcommit">>. % has to be exactly 32 bytes long
-<<"supersecretkeyyoushouldnotcommit">>
+1> Secret = soda:rand(32). % the spec mandates that secret keys must be exactly 32 bytes long.
+<<238,191,60,162,227,35,20,3,135,35,6,69,45,10,213,250,3,
+  106,71,133,119,70,131,43,173,147,60,182,122,...>>
 
 2> Message = erlang:term_to_binary({foo, bar, baz, [1,2,3]}).
 <<131,104,4,100,0,3,102,111,111,100,0,3,98,97,114,100,0,3,
@@ -36,13 +37,31 @@ Add this to your `rebar.config` file to install the library through hex.pm:
       100,0,3,98,97,122,107,0,3,1,2,3>>}
 ```
 
-`branca:encode/2` should never fail. However, `branca:decode/2` has a few different return types:
 
-- `{ok, OriginalData}` -> successful decryption.
-- `{error, expired_timestamp, {Timestamp, OriginalData}}` -> Successful decryption, but the token expired (not yet implemented).
-- `{error, bad_encoding}` -> CipherText contained at least one non-base62 character (these are [0-9A-Za-z]).
-- `{error, invalid_token}` -> CipherText is base62, but it does not have the [layout] of a valid Branca token.
+## API
+
+### `branca:encode/2`
+
+Uses `Secret` to turn `PlainText` into a Branca token. Returns the token as an Erlang binary.
+
+### `branca:encode/3`
+
+Same as above, but using a custom [timestamp]. If used, it must be greater than 0 and less than 2^32 (4 bytes long).
+
+### `branca:decode/2`
+
+Uses `Secret` to turn a Branca token into the original `PlainText`. Returns a two-valued tuple for each possible outcome:
+
+- `{ok, PlainText}` -> successful token decryption.
+- `{error, bad_encoding}` -> `CipherText` contains at least one non-base62 character.
+- `{error, invalid_token}` -> `CipherText` is base62, but it does not have the [layout] of a valid Branca token.
 - `{error, invalid_sig}` -> the Secret used to decrypt the token is incorrect, or the token has been tampered.
+
+### `branca:decode/3`
+
+Same as above, but using a `TTL` to determine if the token has to be considered stale. Might return all of the above tuples, plus:
+
+- `{expired, PlainText}` -> the token was successfully decrypted, but it expired (i.e. it was minted more than `TTL` seconds ago).
 
 
 ## Testing
@@ -53,9 +72,6 @@ These can be run with the usual rebar3 commands (`rebar3 eunit` and `rebar3 prop
 
 
 ## Caveats
-
-- Timestamp expiration has not been implemented yet. The next release will introduce a new `branca:encode/3` function
-  that will allow the programmer to specify a timestamp at which the token must be considered as "expired".
 
 - Branca mandates the XChaCha20 variant of the ChaCha20-Poly1305 AEAD construction. However, the
   libsodium binding for Erlang is currently built for version 1.0.11 of libsodium, and the XChaCha20 variant
@@ -76,4 +92,5 @@ These can be run with the usual rebar3 commands (`rebar3 eunit` and `rebar3 prop
 - [ ] Improve all modules documentation
 
 [Branca specification]: https://github.com/tuupola/branca-spec
+[timestamp]: https://github.com/tuupola/branca-spec#timestamp
 [layout]: https://github.com/tuupola/branca-spec#token-format

@@ -4,7 +4,7 @@
 -import(libsodium_crypto_aead_chacha20poly1305, [ietf_encrypt/4, ietf_decrypt/4]).
 
 %% API exports
--export([encode/2, encode/3, decode/2]).
+-export([encode/2, encode/3, decode/2, decode/3]).
 
 -define(MAX_TIMESTAMP, 16#FFFFFFFF).
 -define(NONCE_LENGTH, 12).
@@ -33,6 +33,25 @@ encode(PlainText, Secret, Timestamp)
   Payload = ietf_encrypt(PlainText, Header, Nonce, Secret),
   encode(<<Header/binary, Payload/binary>>).
 
+decode(CipherText, Secret, TTL)
+  when
+    is_integer(TTL),
+    0 =< TTL
+
+  ->
+
+  try
+    {ok, PlainText} = decode(CipherText, Secret),
+    {Timestamp, _, _, _} = decompose_token(CipherText),
+    ElapsedTime = erlang:system_time(seconds) - Timestamp,
+    if
+      ElapsedTime < TTL -> {ok, PlainText};
+      true -> {expired, PlainText}
+    end
+  catch
+      error:{badmatch, Error} -> Error
+  end.
+
 decode(CipherText, Secret)
   when
     is_binary(CipherText),
@@ -41,12 +60,11 @@ decode(CipherText, Secret)
   ->
 
   try
-    <<Header:17/bytes, Payload/binary>> = decode(CipherText),
-    <<?VERSION_BYTE:8, _:4/bytes, Nonce:12/bytes>> = Header,
-    Result = ietf_decrypt(Payload, Header, Nonce, Secret),
+    {_, Nonce, Header, Payload} = decompose_token(CipherText),
+    PlainText = ietf_decrypt(Payload, Header, Nonce, Secret),
     if
-      -1 =:= Result -> {error, invalid_sig};
-      true -> {ok, Result}
+      -1 =:= PlainText -> {error, invalid_sig};
+      true -> {ok, PlainText}
     end
   catch
     throw:bad_encoding -> {error, bad_encoding};
@@ -56,3 +74,7 @@ decode(CipherText, Secret)
 %%====================================================================
 %% Internal functions
 %%====================================================================
+decompose_token(Token) ->
+  <<Header:17/bytes, Payload/binary>> = decode(Token),
+  <<?VERSION_BYTE:8, Timestamp:32/integer, Nonce:12/bytes>> = Header,
+  {Timestamp, Nonce, Header, Payload}.
