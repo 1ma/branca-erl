@@ -4,7 +4,7 @@
 -import(libsodium_crypto_aead_chacha20poly1305, [ietf_encrypt/4, ietf_decrypt/4]).
 
 %% API exports
--export([encode/2, decode/2]).
+-export([encode/2, encode/3, decode/2]).
 
 -define(MAX_TIMESTAMP, 16#FFFFFFFF).
 -define(NONCE_LENGTH, 12).
@@ -14,16 +14,22 @@
 %%====================================================================
 %% API functions
 %%====================================================================
-encode(PlainText, Secret)
+encode(PlainText, Secret) ->
+  encode(PlainText, Secret, erlang:system_time(seconds)).
+
+encode(PlainText, Secret, Timestamp)
   when
     is_binary(PlainText),
     is_binary(Secret),
-    ?SECRET_LENGTH =:= byte_size(Secret)
+    is_integer(Timestamp),
+    ?SECRET_LENGTH =:= byte_size(Secret),
+    0 =< Timestamp,
+    Timestamp =< ?MAX_TIMESTAMP
 
   ->
 
   Nonce = buf(?NONCE_LENGTH),
-  Header = <<?VERSION_BYTE:8, ?MAX_TIMESTAMP:32, Nonce/binary>>,
+  Header = <<?VERSION_BYTE:8, Timestamp:32, Nonce/binary>>,
   Payload = ietf_encrypt(PlainText, Header, Nonce, Secret),
   encode(<<Header/binary, Payload/binary>>).
 
