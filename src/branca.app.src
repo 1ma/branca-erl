@@ -1,7 +1,7 @@
 {application, branca,
  [{description, "An Erlang implementation of the Branca specification for authenticated and encrypted tokens"},
   {pkg_name, branca_erl},
-  {vsn, "0.1.1"},
+  {vsn, "0.2.0"},
   {registered, []},
   {applications,
    [kernel,
