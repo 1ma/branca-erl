@@ -1,7 +1,6 @@
 -module(branca).
 -import(branca_base62, [encode/1, decode/1]).
--import(libsodium_randombytes, [buf/1]).
--import(libsodium_crypto_aead_chacha20poly1305, [ietf_encrypt/4, ietf_decrypt/4]).
+-import(enacl, [aead_chacha20poly1305_ietf_decrypt/4, aead_chacha20poly1305_ietf_encrypt/4, randombytes/1]).
 
 %% API exports
 -export([encode/2, encode/3, decode/2, decode/3]).
@@ -28,9 +27,9 @@ encode(PlainText, Secret, Timestamp)
 
   ->
 
-  Nonce = buf(?NONCE_LENGTH),
+  Nonce = randombytes(?NONCE_LENGTH),
   Header = <<?VERSION_BYTE:8, Timestamp:32, Nonce/binary>>,
-  Payload = ietf_encrypt(PlainText, Header, Nonce, Secret),
+  Payload = aead_chacha20poly1305_ietf_encrypt(PlainText, Header, Nonce, Secret),
   encode(<<Header/binary, Payload/binary>>).
 
 decode(CipherText, Secret, TTL)
@@ -61,11 +60,7 @@ decode(CipherText, Secret)
 
   try
     {_, Nonce, Header, Payload} = decompose_token(CipherText),
-    PlainText = ietf_decrypt(Payload, Header, Nonce, Secret),
-    if
-      -1 =:= PlainText -> {error, invalid_sig};
-      true -> {ok, PlainText}
-    end
+    enacl_result_adapter(aead_chacha20poly1305_ietf_decrypt(Payload, Header, Nonce, Secret))
   catch
     throw:bad_encoding -> {error, bad_encoding};
     error:{badmatch, _} -> {error, invalid_token}
@@ -78,3 +73,6 @@ decompose_token(Token) ->
   <<Header:17/bytes, Payload/binary>> = decode(Token),
   <<?VERSION_BYTE:8, Timestamp:32/integer, Nonce:12/bytes>> = Header,
   {Timestamp, Nonce, Header, Payload}.
+
+enacl_result_adapter({error, failed_verification}) -> {error, invalid_sig};
+enacl_result_adapter(PlainText) when is_binary(PlainText) -> {ok, PlainText}.

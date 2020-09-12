@@ -2,27 +2,27 @@
 -include_lib("eunit/include/eunit.hrl").
 
 happy_path_test() ->
-  Secret = libsodium_randombytes:buf(32),
+  Secret = enacl:randombytes(32),
   Message = <<"abcd">>,
   ?assertEqual({ok, Message}, branca:decode(branca:encode(Message, Secret), Secret)).
 
 bad_encoding_test() ->
-  Secret = libsodium_randombytes:buf(32),
+  Secret = enacl:randombytes(32),
   NonBase62CipherText = <<"abcd%e#f">>,
   ?assertEqual({error, bad_encoding}, branca:decode(NonBase62CipherText, Secret)).
 
 invalid_magic_byte_test() ->
-  Secret = libsodium_randombytes:buf(32),
+  Secret = enacl:randombytes(32),
   BadCipherText = branca_base62:encode(<<16#BB, 255, 255, 255, 255, 0, 1, 2, 3>>),
   ?assertEqual({error, invalid_token}, branca:decode(BadCipherText, Secret)).
 
 partial_timestamp_test() ->
-  Secret = libsodium_randombytes:buf(32),
+  Secret = enacl:randombytes(32),
   BadCipherText = branca_base62:encode(<<16#BA, 255, 255>>),
   ?assertEqual({error, invalid_token}, branca:decode(BadCipherText, Secret)).
 
 empty_payload_test() ->
-  Secret = libsodium_randombytes:buf(32),
+  Secret = enacl:randombytes(32),
   BadCipherText = branca_base62:encode(<<16#BA, 255, 255, 255, 255>>),
   ?assertEqual({error, invalid_token}, branca:decode(BadCipherText, Secret)).
 
