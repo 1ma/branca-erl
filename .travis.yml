@@ -1,11 +1,13 @@
+dist: bionic
+
 language: erlang
 otp_release:
-  - 21.0
-  - 20.0
-  - 19.0
+  - "23.0"
 
 before_script:
   - kerl list installations
+  - sudo apt-get update
+  - sudo apt-get install -y libsodium-dev
   - rebar3 as test get-deps
 
 script:
