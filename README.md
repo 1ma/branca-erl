@@ -73,11 +73,6 @@ These can be run with the usual rebar3 commands (`rebar3 eunit` and `rebar3 prop
 
 ## Caveats
 
-- Branca mandates the XChaCha20 variant of the ChaCha20-Poly1305 AEAD construction. However, the
-  libsodium binding for Erlang is currently built for version 1.0.11 of libsodium, and the XChaCha20 variant
-  was not introduced until version 1.0.12. In the meantime branca-erl uses the IETF ChaCha20 variant,
-  that differs in the nonce length (12 bytes instead of 24).
-
 - The base62 encoding and decoding is based on an O(n^2) algorithm involving arithmetic division and is _dog slow_.
   On my development laptop encoding 1KB of random data takes about 100ms, and 5KB jumps to 2.5s.
   Future releases might try to mitigate this problem by implementing `branca_transcoder` as a NIF, or replace
