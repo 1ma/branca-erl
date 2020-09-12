@@ -28,7 +28,7 @@ empty_payload_test() ->
 
 tampetered_token_test() ->
   Secret = <<146,182,47,180,112,47,49,226,12,213,203,121,70,7,165,70,102,152,113,201,33,41,56,87,152,180,187,76,249,250,191,136>>,
-  OriginalCipherText = <<"DqNWDzgpNY77mVnn8FzAVCnoaX7v3ROUpx6wTtqSKNJquKjHJm">>,
-  TamperedCipherText = <<"DqNWDzgpNY77mVnn8FzAVCnoaX7v3ROUpx6wTtqSKNJquKjHJn">>,
+  OriginalCipherText = <<"MvmI9Qm2rgd2bhxshQa09CSQbMUUd3qJgUkYvlCvigduEPODBIEBit2IEnkrd0Dq24">>,
+  TamperedCipherText = <<"MvmI9Qm2rgd2bhxshQa09CSQbMUUd3qJgUkYvlCvigduEPODBIEBit2IEnkrd0Dq25">>,
   ?assertEqual({ok, <<"abcd">>}, branca:decode(OriginalCipherText, Secret)),
   ?assertEqual({error, invalid_sig}, branca:decode(TamperedCipherText, Secret)).
