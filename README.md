@@ -1,6 +1,6 @@
 # branca-erl
 
-[![Build Status](https://travis-ci.org/1ma/branca-erl.svg?branch=master)](https://travis-ci.org/1ma/branca-erl)
+![.github/workflows/testing.yml](https://github.com/1ma/branca-erl/workflows/.github/workflows/testing.yml/badge.svg)
 
 An Erlang implementation of the [Branca specification] for authenticated and encrypted tokens.
 
